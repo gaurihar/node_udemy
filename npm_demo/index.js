@@ -9,7 +9,7 @@ const app = express();
 const courses=[
     {id:1,name: 'course1'},
     {id:2,name:'course2'},
-    {id:2,name:'course2'},
+    {id:3,name:'course3'},
 
 ]
 console.log(courses.length)
@@ -25,12 +25,16 @@ app.get('/',(req,res)=>{
 });
 
 app.get('/api/courses',(req,res)=>{
-    res.send(["Marathi", "Hindi", "Eng"]);
+   res.send(courses);
+
 
 });
 
 app.get('/api/courses/:id',(req,res)=>{
-    res.send(req.params.id);
+    const course=courses.find(c=>c.id==parseInt(req.params.id));
+    console.log(course)
+    if(!course) res.status(404).send('course of given id is Not Found');
+    res.send(course);
 
 });
 
@@ -57,24 +61,38 @@ app.post('/api/courses',(req,res)=>{
 
 app.put('/api/courses/:id',(req,res)=>{
     // id check
+
+    console.log("you are in put call");
     const course=courses.find(c=>c.id==parseInt(req.params.id));
+    console.log(course)
     if(!course) res.status(404).send('course of given id is Not Found');
     //if invalidat return bad req
 
-    //const result=validateCourse(req.body);
+    
     //object destruction
-    const {error}=validateCourse(req.body); //reult.error
-    if(error){
-    res.status(400).send(error.details[0].message)
-    }
-
-
+    const { error }=validateCourse(req.body); //reult.error
+//     if(error)
+//     {
+//     res.status(400).send(error.details[0].message);
+//     return;
+//    }
     //update
-
     course.name=req.body.name;
-    res.send(course)
+    console.log(course.name)
+    res.send(course);
 
 });
+
+
+app.delete('/api/courses/:id',(req,res)=>{
+
+    const course=courses.find(c=>c.id==parseInt(req.params.id));
+    console.log(course)
+    if(!course) res.status(404).send('course of given id is Not Found');
+    const index=courses.includes(course);
+    courses.splice(index,1);
+    res.send(course);
+})
 
 function validateCourse(course){
     const schema={
